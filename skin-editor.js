@@ -229,9 +229,13 @@ class SkinEditor {
         }
         
         // Reload skin in current game if running
-        if (typeof currentGame !== 'undefined' && currentGame) {
-            currentGame.loadPlayerSkin();
-        }
+        // Reload skin in current game if running (only if not playing)
+if (typeof currentGame !== 'undefined' && currentGame) {
+    if (currentGame.gameState !== 'playing') {
+        currentGame.loadPlayerSkin();
+    }
+    // If playing, skin will be applied after game over/restart
+}
         
         this.showNotification('Skin applied successfully! 🎉', 'success');
         
@@ -313,3 +317,4 @@ let skinEditor;
 document.addEventListener('DOMContentLoaded', () => {
     skinEditor = new SkinEditor();
 });
+
