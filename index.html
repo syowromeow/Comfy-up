@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comfy Up Game</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #87CEEB 0%, #B0E0E6 100%);
+            font-family: 'Arial', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .screen {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(135deg, #87CEEB 0%, #B0E0E6 100%);
+        }
+        
+        .screen.active {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Главное меню */
+        .menu-container {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 90%;
+        }
+        
+        .game-title {
+            font-size: 48px;
+            color: #4A90E2;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .game-subtitle {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .nickname-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            font-size: 16px;
+            margin-bottom: 10px;
+            text-align: center;
+            box-sizing: border-box;
+        }
+        
+        .nickname-input:focus {
+            outline: none;
+            border-color: #4A90E2;
+        }
+        
+        .error-message {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .btn {
+            background: #4A90E2;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 18px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+            min-width: 150px;
+        }
+        
+        .btn:hover:not(:disabled) {
+            background: #357ABD;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .btn-secondary {
+            background: #95a5a6;
+        }
+        
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+        
+        /* Игровой экран */
+        .game-container {
+            position: relative;
+            text-align: center;
+        }
+        
+        .game-info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            font-size: 18px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            z-index: 10;
+        }
+        
+        .sound-toggle {
+            position: absolute;
+            top: 0;
+            right: -200px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            width: 50px;
+            height: 50px;
+            transition: all 0.3s ease;
+        }
+        
+        .sound-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+        
+        #gameCanvas {
+            border: 3px solid #fff;
+            border-radius: 10px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            background: #87CEEB;
+        }
+        
+        /* Экран окончания игры */
+        .game-over-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            max-width: 500px;
+            width: 90%;
+        }
+        
+        .final-score {
+            font-size: 36px;
+            color: #4A90E2;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        
+        .score-label {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        /* Лидерборд */
+        .leaderboard-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+        
+        .leaderboard-title {
+            font-size: 32px;
+            color: #4A90E2;
+            text-align: center;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .leaderboard-controls {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .leaderboard-table {
+            margin-bottom: 30px;
+        }
+        
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .menu-container, .game-over-container, .leaderboard-container {
+                margin: 20px;
+                padding: 30px;
+            }
+            
+            .game-title {
+                font-size: 36px;
+            }
+            
+            #gameCanvas {
+                max-width: 100%;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Главное меню -->
+    <div id="mainMenuScreen" class="screen active">
+        <div class="menu-container">
+            <div class="game-title">☁️ Comfy Up</div>
+            <div class="game-subtitle">Jump on clouds and reach new heights!</div>
+            
+            <input type="text" id="nickname" class="nickname-input" placeholder="Enter your nickname" maxlength="12">
+            <div id="nicknameError" class="error-message">Nickname must contain at least 3 characters</div>
+            
+            <div>
+                <button id="startGame" class="btn">🚀 Start Game</button>
+            </div>
+            <div>
+                <button id="openLeaderboard" class="btn btn-secondary">🏆 Leaderboard</button>
+            </div>
+            <div>
+                <button id="toggleSound" class="btn btn-secondary">🔊 Sound: ON</button>
+            </div>
+            <div>
+                <button id="openSkinEditor" class="btn btn-secondary">✨ Create Skin</button>
+            </div>
+            <div id="skinPreview" style="display: none; margin-top: 15px; text-align: center;">
+                <div style="margin-bottom: 10px; color: #4A90E2; font-weight: bold;">Current Skin:</div>
+                <img id="skinPreviewImage" style="width: 60px; height: 60px; border: 2px solid #4A90E2; border-radius: 10px;">
+                <div>
+                    <button id="removeSkin" class="btn" style="margin-top: 10px; padding: 8px 16px; font-size: 14px;">❌ Remove</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="gameScreen" class="screen">
+        <div class="game-container">
+            <div class="game-info">
+                <button id="gameSoundToggle" class="sound-toggle">🔊</button>
+            </div>
+            <canvas id="gameCanvas" width="800" height="600"></canvas>
+        </div>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div id="gameOverScreen" class="screen">
+        <div class="game-over-container">
+            <h2>🎮 Game Over!</h2>
+            
+            <div class="score-label">Your Score:</div>
+            <div class="final-score" id="finalScore">0 points</div>
+            
+            <div class="score-label">Best Score:</div>
+            <div class="final-score" id="bestScore">0 points</div>
+            
+            <div>
+                <button id="playAgain" class="btn">🔄 Play Again</button>
+                <button id="goToLeaderboard" class="btn btn-secondary">🏆 Leaderboard</button>
+            </div>
+            <div>
+                <button id="goToMainMenu" class="btn btn-secondary">🏠 Main Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaderboard Screen -->
+    <div id="leaderboardScreen" class="screen">
+        <div class="leaderboard-container">
+            <div class="leaderboard-title">🏆 Leaderboard</div>
+            
+            
+            <div id="leaderboardTable" class="leaderboard-table">
+                <!-- Leaderboard table will be here -->
+            </div>
+            
+            <div style="text-align: center;">
+                <button id="backFromLeaderboard" class="btn">⬅️ Back</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Skin Editor Screen -->
+    <div id="skinEditorScreen" class="screen">
+        <div class="leaderboard-container" style="max-width: 900px;">
+            <div class="leaderboard-title">✨ Skin Editor</div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px;">
+                <!-- Upload Section -->
+                <div style="background: rgba(255, 255, 255, 0.9); border-radius: 20px; padding: 25px;">
+                    <h3 style="color: #4A90E2; margin-bottom: 20px; text-align: center;">📁 Upload Image</h3>
+                    
+                    <div id="dropZone" style="
+                        border: 3px dashed #4A90E2;
+                        border-radius: 15px;
+                        padding: 40px 20px;
+                        text-align: center;
+                        background: rgba(74, 144, 226, 0.1);
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        margin-bottom: 20px;
+                    ">
+                        <div style="font-size: 48px; margin-bottom: 10px;">📸</div>
+                        <div style="color: #4A90E2; font-weight: bold; margin-bottom: 5px;">Drag & Drop or Click</div>
+                        <div style="color: #666; font-size: 14px;">PNG, JPG, GIF, SVG supported</div>
+                    </div>
+                    
+                    <input type="file" id="editorFileInput" accept="image/*" style="display: none;">
+                    
+                    <div style="text-align: center;">
+                        <button id="selectFile" class="btn" style="margin: 5px;">📁 Select File</button>
+                        <button id="clearEditor" class="btn btn-secondary" style="margin: 5px;">🗑️ Clear</button>
+                    </div>
+                </div>
+                
+                <!-- Preview Section -->
+                <div style="background: rgba(255, 255, 255, 0.9); border-radius: 20px; padding: 25px;">
+                    <h3 style="color: #4A90E2; margin-bottom: 20px; text-align: center;">👀 Preview</h3>
+                    
+                    <div style="display: flex; justify-content: space-around; align-items: center; margin-bottom: 20px;">
+                        <div style="text-align: center;">
+                            <div style="color: #666; font-size: 12px; margin-bottom: 5px;">Original</div>
+                            <div id="originalPreview" style="
+                                width: 80px; 
+                                height: 80px; 
+                                border: 2px solid #ddd; 
+                                border-radius: 10px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                background: #f8f8f8;
+                                color: #999;
+                                font-size: 12px;
+                            ">No image</div>
+                        </div>
+                        
+                        <div style="color: #4A90E2; font-size: 24px;">→</div>
+                        
+                        <div style="text-align: center;">
+                            <div style="color: #666; font-size: 12px; margin-bottom: 5px;">120x120</div>
+                            <div id="processedPreview" style="
+                                width: 80px; 
+                                height: 80px; 
+                                border: 2px solid #4A90E2; 
+                                border-radius: 10px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                background: #f8f8f8;
+                                color: #999;
+                                font-size: 12px;
+                            ">Auto-sized</div>
+                        </div>
+                        
+                        <div style="color: #4A90E2; font-size: 24px;">→</div>
+                        
+                        <div style="text-align: center;">
+                            <div style="color: #666; font-size: 12px; margin-bottom: 5px;">In Game</div>
+                            <div id="gamePreview" style="
+                                width: 30px; 
+                                height: 30px; 
+                                border: 2px solid #27AE60; 
+                                border-radius: 5px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                background: #87CEEB;
+                                color: #999;
+                                font-size: 10px;
+                                margin: 0 auto;
+                            ">30x30</div>
+                        </div>
+                    </div>
+                    
+                    <div id="imageInfo" style="
+                        background: rgba(74, 144, 226, 0.1);
+                        border-radius: 10px;
+                        padding: 15px;
+                        font-size: 14px;
+                        color: #666;
+                        text-align: center;
+                        display: none;
+                    ">
+                        <div><strong>File:</strong> <span id="fileName">-</span></div>
+                        <div><strong>Size:</strong> <span id="fileSize">-</span></div>
+                        <div><strong>Dimensions:</strong> <span id="fileDimensions">-</span></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Info Section -->
+            <div style="
+                background: rgba(255, 255, 255, 0.9);
+                border-radius: 20px;
+                padding: 25px;
+                margin-bottom: 30px;
+                text-align: center;
+            ">
+                <h3 style="color: #4A90E2; margin-bottom: 15px;">⚡ Auto Convert</h3>
+                <p style="color: #666; margin-bottom: 10px;">
+                    Any image you upload will be automatically converted to <strong>120x120 pixels</strong><br>
+                    Perfect size for game skins!
+                </p>
+                <div style="
+                    background: rgba(74, 144, 226, 0.1);
+                    border-radius: 10px;
+                    padding: 15px;
+                    color: #4A90E2;
+                    font-weight: bold;
+                ">
+                    📏 Output: 120x120 PNG | 🎯 Optimized for game
+                </div>
+            </div>
+            
+            <!-- Actions -->
+            <div style="text-align: center; margin-bottom: 20px;">
+                <button id="applySkin" class="btn" style="margin: 5px; font-size: 18px; padding: 15px 30px; background: #27AE60;" disabled>
+                    ✅ Apply as Skin
+                </button>
+                <p style="color: #666; font-size: 14px; margin-top: 10px;">
+                    Image will be automatically converted when you apply it
+                </p>
+            </div>
+            
+            <div style="text-align: center;">
+                <button id="backFromSkinEditor" class="btn btn-secondary">⬅️ Back to Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    
+    <!-- Подключаем скрипты -->
+    <script src="js/audio.js"></script>
+    <script src="js/leaderboard.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/firebase-leaderboard.js"></script>
+    <script src="js/skin-editor.js"></script>
+    <script src="js/game.js"></script>
+    <script>
+        // Глобальные переменные
+        let gameManager;
+        let leaderboard;
+        let currentGame;
+        let audioManager;
+        
+        // Initialize after DOM load
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Initializing game...');
+            
+            // Create global audio manager
+            audioManager = new AudioManager();
+            
+            // Create Firebase leaderboard (with local fallback)
+            leaderboard = new FirebaseLeaderboard();
+            
+            // Setup event listeners
+            setupEventListeners();
+            
+            // Load saved nickname
+            loadPlayerNickname();
+            
+            // Load skin preview
+            loadSkinPreview();
+            
+            console.log('Game initialized');
+        });
+        
+        function setupEventListeners() {
+            // Main menu
+            document.getElementById('startGame').addEventListener('click', startGame);
+            document.getElementById('openLeaderboard').addEventListener('click', () => showScreen('leaderboard'));
+            
+            // Game
+            document.addEventListener('keydown', handleGameKeyDown);
+            document.addEventListener('keyup', handleGameKeyUp);
+            
+            // Game over
+            document.getElementById('playAgain').addEventListener('click', startGame);
+            document.getElementById('goToLeaderboard').addEventListener('click', () => showScreen('leaderboard'));
+            document.getElementById('goToMainMenu').addEventListener('click', () => showScreen('mainMenu'));
+            
+            // Leaderboard
+            document.getElementById('backFromLeaderboard').addEventListener('click', () => showScreen('mainMenu'));
+            
+            // Sound controls
+            document.getElementById('toggleSound').addEventListener('click', toggleSound);
+            document.getElementById('gameSoundToggle').addEventListener('click', toggleGameSound);
+            
+            
+            // Skin editor controls
+            document.getElementById('openSkinEditor').addEventListener('click', () => showScreen('skinEditor'));
+            document.getElementById('backFromSkinEditor').addEventListener('click', () => showScreen('mainMenu'));
+            
+            // Remove skin button
+            document.getElementById('removeSkin').addEventListener('click', removeSkin);
+            
+            
+            // Nickname
+            const nicknameInput = document.getElementById('nickname');
+            nicknameInput.addEventListener('input', (e) => validateNickname(e.target.value));
+            nicknameInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') startGame();
+            });
+        }
+        
+        function validateNickname(nickname) {
+            const errorElement = document.getElementById('nicknameError');
+            const startGameBtn = document.getElementById('startGame');
+            
+            if (nickname.length < 3) {
+                errorElement.textContent = 'Nickname must contain at least 3 characters';
+                errorElement.style.display = 'block';
+                startGameBtn.disabled = true;
+            } else if (nickname.length > 12) {
+                errorElement.textContent = 'Nickname must not exceed 12 characters';
+                errorElement.style.display = 'block';
+                startGameBtn.disabled = true;
+            } else {
+                errorElement.style.display = 'none';
+                startGameBtn.disabled = false;
+            }
+        }
+        
+        function loadPlayerNickname() {
+            const nicknameInput = document.getElementById('nickname');
+            const savedNickname = localStorage.getItem('playerNickname');
+            
+            if (savedNickname) {
+                nicknameInput.value = savedNickname;
+                validateNickname(savedNickname);
+            }
+        }
+        
+        function startGame() {
+            const nicknameInput = document.getElementById('nickname');
+            const nickname = nicknameInput.value.trim();
+            
+            if (nickname.length < 3) {
+                alert('Please enter a nickname (minimum 3 characters)');
+                return;
+            }
+            
+            // Save nickname
+            localStorage.setItem('playerNickname', nickname);
+            
+            // Show game screen
+            showScreen('game');
+            
+            // Create new game
+            createGame();
+        }
+        
+        function createGame() {
+            const canvas = document.getElementById('gameCanvas');
+            if (!canvas) {
+                console.error('Canvas not found!');
+                return;
+            }
+            
+            // Create new game
+            currentGame = new TimingJumpGame('gameCanvas');
+            
+            // Set audio manager
+            currentGame.audioManager = audioManager;
+            
+            // Setup callbacks for interface integration
+            currentGame.onScoreChange = (score) => {
+                updateScore(score);
+            };
+            
+            currentGame.onGameOver = (finalScore) => {
+                onGameOver(finalScore);
+            };
+            
+            // Score is now handled by the game canvas
+        }
+        
+        function onGameOver(finalScore) {
+            const nickname = localStorage.getItem('playerNickname') || 'Player';
+            
+            // Add result to leaderboard
+            leaderboard.addScore(nickname, finalScore);
+            
+            // Update final score display
+            document.getElementById('finalScore').textContent = finalScore + ' points';
+            document.getElementById('bestScore').textContent = leaderboard.getPlayerBestScore(nickname) + ' points';
+            
+            // Show game over screen after a short delay
+            setTimeout(() => {
+                showScreen('gameOver');
+            }, 2000);
+        }
+        
+        function updateScore(score) {
+            // Score is now handled by the game canvas
+        }
+        
+        function showScreen(screenName) {
+            // Hide all screens
+            const screens = document.querySelectorAll('.screen');
+            screens.forEach(screen => screen.classList.remove('active'));
+            
+            // Show target screen
+            const targetScreen = document.getElementById(screenName + 'Screen');
+            if (targetScreen) {
+                targetScreen.classList.add('active');
+            }
+            
+            // Special handling for leaderboard screen
+            if (screenName === 'leaderboard') {
+                leaderboard.updateLeaderboard();
+            }
+        }
+        
+        function handleGameKeyDown(e) {
+            if (currentGame && document.getElementById('gameScreen').classList.contains('active')) {
+                // Pass event to game if it's active
+                if (e.code === 'Space') {
+                    e.preventDefault();
+                }
+            }
+        }
+        
+        function handleGameKeyUp(e) {
+            if (currentGame && document.getElementById('gameScreen').classList.contains('active')) {
+                // Pass event to game if it's active
+            }
+        }
+        
+        
+        function toggleSound() {
+            if (audioManager) {
+                const isMuted = audioManager.toggleMute();
+                const button = document.getElementById('toggleSound');
+                button.textContent = isMuted ? '🔇 Sound: OFF' : '🔊 Sound: ON';
+                
+                // Update game sound toggle too
+                const gameButton = document.getElementById('gameSoundToggle');
+                if (gameButton) {
+                    gameButton.textContent = isMuted ? '🔇' : '🔊';
+                }
+            }
+        }
+        
+        function toggleGameSound() {
+            if (audioManager) {
+                const isMuted = audioManager.toggleMute();
+                const gameButton = document.getElementById('gameSoundToggle');
+                gameButton.textContent = isMuted ? '🔇' : '🔊';
+                
+                // Update main menu button too
+                const mainButton = document.getElementById('toggleSound');
+                mainButton.textContent = isMuted ? '🔇 Sound: OFF' : '🔊 Sound: ON';
+            }
+        }
+        
+        
+        function updateSkinPreview(imageSrc) {
+            const preview = document.getElementById('skinPreview');
+            const previewImage = document.getElementById('skinPreviewImage');
+            
+            if (imageSrc) {
+                previewImage.src = imageSrc;
+                preview.style.display = 'block';
+            } else {
+                preview.style.display = 'none';
+            }
+        }
+        
+        function removeSkin() {
+            if (confirm('Remove custom skin and use default character?')) {
+                // Remove from localStorage
+                localStorage.removeItem('customPlayerSkin');
+                
+                // Hide preview
+                updateSkinPreview(null);
+                
+                // Reload skin in current game if running
+                if (currentGame) {
+                    currentGame.playerSkin = null;
+                    currentGame.loadPlayerSkin(); // Перезагрузить скин
+                }
+                
+                console.log('Custom skin removed');
+            }
+        }
+        
+        function loadSkinPreview() {
+            const savedSkin = localStorage.getItem('customPlayerSkin');
+            if (savedSkin) {
+                updateSkinPreview(savedSkin);
+            }
+        }
+        
+    </script>
+</body>
+</html>

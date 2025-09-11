@@ -1,2 +1,19 @@
-# Comfy-up
-Relaxing cloud jumping game: jump on moving clouds, reach new heights! Custom skins, global leaderboard, smooth HTML5 Canvas gameplay, Firebase backend, sound effects, mobile-friendly design. Compete worldwide!
+# Магазин скинов
+
+Здесь размещаются дополнительные скины для игры.
+
+## Требования к скинам:
+- Формат: PNG
+- Размер: 256x256 пикселей (рекомендуется)
+- Прозрачный фон
+- Название файла: любое, но без пробелов
+
+## Как добавить скин:
+1. Поместите PNG файл в эту папку
+2. Перезапустите игру
+3. Скин автоматически появится в магазине
+
+## Цены по умолчанию:
+- Новые скины: 1000 очков
+- Можно изменить в настройках игры
+
