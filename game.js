@@ -583,7 +583,7 @@ class TimingJumpGame {
         // Примеры:
         // this.defaultSkin.src = 'stiker21534623456234569.png/my-character.png';
         // this.defaultSkin.src = 'stiker21534623456234569.png/hero.jpg';
-        this.defaultSkin.src = 'stiker21534623456234569.png';
+        this.defaultSkin.src = 'player.png';
     }
 
     loadPlayerSkin() {
