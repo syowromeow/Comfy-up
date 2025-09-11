@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Comfy Up Game</title>
     <style>
         body {
@@ -40,6 +41,38 @@
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
             max-width: 400px;
             width: 90%;
+        }
+                /* Mobile Controls */
+        .mobile-controls {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            display: none;
+        }
+
+        .jump-button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .jump-button:active {
+            transform: scale(0.95);
+            background: #45a049;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-controls {
+                display: block !important;
+            }
         }
         
         .game-title {
@@ -266,6 +299,10 @@
                 <button id="gameSoundToggle" class="sound-toggle">🔊</button>
             </div>
             <canvas id="gameCanvas" width="800" height="600"></canvas>
+        </div>
+                <!-- Mobile Jump Button -->
+        <div id="mobileControls" class="mobile-controls">
+            <button id="jumpButton" class="jump-button">🚀 JUMP</button>
         </div>
     </div>
 
@@ -531,6 +568,23 @@
                 if (e.key === 'Enter') startGame();
             });
         }
+            // Mobile jump button
+    const jumpButton = document.getElementById('jumpButton');
+    if (jumpButton) {
+        jumpButton.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            if (currentGame && currentGame.gameState === 'playing') {
+                currentGame.jump();
+            }
+        });
+        
+        jumpButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (currentGame && currentGame.gameState === 'playing') {
+                currentGame.jump();
+            }
+        });
+    }
         
         function validateNickname(nickname) {
             const errorElement = document.getElementById('nicknameError');
