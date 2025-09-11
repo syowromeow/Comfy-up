@@ -581,9 +581,9 @@ class TimingJumpGame {
         
         // 🎨 ЗАМЕНИТЕ ЭТОТ ПУТЬ НА СВОЮ КАРТИНКУ:
         // Примеры:
-        // this.defaultSkin.src = 'skins/default/my-character.png';
-        // this.defaultSkin.src = 'skins/default/hero.jpg';
-        this.defaultSkin.src = 'skins/default/stiker2153462345623456.png';
+        // this.defaultSkin.src = 'stiker21534623456234569.png/my-character.png';
+        // this.defaultSkin.src = 'stiker21534623456234569.png/hero.jpg';
+        this.defaultSkin.src = 'stiker21534623456234569.png';
     }
 
     loadPlayerSkin() {
