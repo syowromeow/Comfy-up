@@ -300,10 +300,8 @@
             </div>
             <canvas id="gameCanvas" width="800" height="600"></canvas>
         </div>
-                <!-- Mobile Jump Button -->
-        <div id="mobileControls" class="mobile-controls">
-            <button id="jumpButton" class="jump-button">🚀 JUMP</button>
-        </div>
+              
+        
     </div>
 
     <!-- Game Over Screen -->
@@ -559,6 +557,23 @@
             
             // Remove skin button
             document.getElementById('removeSkin').addEventListener('click', removeSkin);
+                
+    // Mobile touch controls - tap anywhere on screen to jump
+    const canvas = document.getElementById('gameCanvas');
+    if (canvas) {
+        canvas.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            if (currentGame && (currentGame.gameState === 'waiting' || currentGame.gameState === 'playing')) {
+                currentGame.handleJump();
+            }
+        });
+
+        canvas.addEventListener('click', function(e) {
+            if (currentGame && (currentGame.gameState === 'waiting' || currentGame.gameState === 'playing')) {
+                currentGame.handleJump();
+            }
+        });
+    }
             
             
             // Nickname
