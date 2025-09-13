@@ -563,6 +563,10 @@
     if (canvas) {
         canvas.addEventListener('touchstart', function(e) {
             e.preventDefault();
+            // Initialize audio on first touch (mobile)
+            if (audioManager) {
+                audioManager.initializeAfterUserInteraction();
+            }
             if (currentGame && (currentGame.gameState === 'waiting' || currentGame.gameState === 'playing')) {
                 currentGame.handleJump();
             }
