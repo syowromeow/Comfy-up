@@ -8,6 +8,14 @@ class AudioManager {
         this.isMuted = false;
         this.musicStopped = false;
         this.backgroundMusic = null;
+                this.backgroundMusic = null;
+        
+        // Mobile audio support
+        this.isInitialized = false;
+        this.isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        this.needsUserInteraction = this.isMobile;
+        
+        this.init();
         
         this.init();
     }
@@ -134,6 +142,18 @@ class AudioManager {
     }
     
     startBackgroundMusic() {
+startBackgroundMusic() {
+    if (this.audioContext && this.playBackgroundLoop && !this.isMuted) {
+        // Mobile check - don't start until user interaction
+        if (this.needsUserInteraction && !this.isInitialized) {
+            console.log('Waiting for user interaction to start music on mobile');
+            return;
+        }
+        
+        // Resume audio context if suspended...
+        // остальной код
+    }
+}
         if (this.audioContext && this.playBackgroundLoop && !this.isMuted) {
             // Resume audio context if suspended (required by some browsers)
             if (this.audioContext.state === 'suspended') {
@@ -229,6 +249,15 @@ class AudioManager {
             
         } catch (error) {
             console.warn('Game over sound error:', error);
+        }
+    }
+        
+    // Initialize audio after user interaction (for mobile)
+    initializeAfterUserInteraction() {
+        if (this.needsUserInteraction && !this.isInitialized) {
+            console.log('Initializing audio after user interaction');
+            this.isInitialized = true;
+            this.startBackgroundMusic();
         }
     }
 }
