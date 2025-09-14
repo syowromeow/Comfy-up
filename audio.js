@@ -142,7 +142,6 @@ class AudioManager {
     }
     
     startBackgroundMusic() {
-startBackgroundMusic() {
     if (this.audioContext && this.playBackgroundLoop && !this.isMuted) {
         // Mobile check - don't start until user interaction
         if (this.needsUserInteraction && !this.isInitialized) {
