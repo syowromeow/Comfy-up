@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Comfy Up Game</title>
     <style>
@@ -587,23 +586,7 @@
                 if (e.key === 'Enter') startGame();
             });
         }
-            // Mobile jump button
-    const jumpButton = document.getElementById('jumpButton');
-    if (jumpButton) {
-        jumpButton.addEventListener('touchstart', function(e) {
-            e.preventDefault();
-            if (currentGame && currentGame.gameState === 'playing') {
-                currentGame.jump();
-            }
-        });
-        
-        jumpButton.addEventListener('click', function(e) {
-            e.preventDefault();
-            if (currentGame && currentGame.gameState === 'playing') {
-                currentGame.jump();
-            }
-        });
-    }
+         
         
         function validateNickname(nickname) {
             const errorElement = document.getElementById('nicknameError');
