@@ -8,15 +8,13 @@ class AudioManager {
         this.isMuted = false;
         this.musicStopped = false;
         this.backgroundMusic = null;
-                this.backgroundMusic = null;
         
         // Mobile audio support
         this.isInitialized = false;
         this.isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         this.needsUserInteraction = this.isMobile;
         
-        this.init();
-        
+    
         this.init();
     }
     
@@ -150,9 +148,7 @@ class AudioManager {
         }
         
         // Resume audio context if suspended...
-        // остальной код
     }
-}
         if (this.audioContext && this.playBackgroundLoop && !this.isMuted) {
             // Resume audio context if suspended (required by some browsers)
             if (this.audioContext.state === 'suspended') {
