@@ -511,7 +511,12 @@
             console.log('Initializing game...');
             
             // Create global audio manager
-            audioManager = new AudioManager();
+            try {
+    audioManager = new AudioManager();
+} catch (error) {
+    console.error('AudioManager failed to initialize:', error);
+    audioManager = null;
+}
             
             // Create Firebase leaderboard (with local fallback)
             leaderboard = new FirebaseLeaderboard();
